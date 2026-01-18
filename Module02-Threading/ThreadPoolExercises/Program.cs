@@ -12,18 +12,26 @@ namespace ThreadPoolExercises
 
             Console.WriteLine($"Main thread is {Thread.CurrentThread.ManagedThreadId}");
 
-            ThreadingHelpers.ExecuteOnThread(() =>
-            {
-                var thread = Thread.CurrentThread;
-                Console.WriteLine($"Hello from thread {thread.ManagedThreadId} from a pool: {thread.IsThreadPoolThread}");
-            }, 3);
-
-            ThreadingHelpers.ExecuteOnThreadPool(() =>
-            {
-                var thread = Thread.CurrentThread;
-                Console.WriteLine(
-                    $"Hello from thread {thread.ManagedThreadId} from a pool: {thread.IsThreadPoolThread}");
-            }, 3);
+            ThreadingHelpers.ExecuteOnThreadPool(
+                () => throw new NullReferenceException(), 
+                10, 
+                errorAction: _ =>
+                {
+                    Console.WriteLine("1");
+                });
+            
+            // ThreadingHelpers.ExecuteOnThread(() =>
+            // {
+            //     var thread = Thread.CurrentThread;
+            //     Console.WriteLine($"Hello from thread {thread.ManagedThreadId} from a pool: {thread.IsThreadPoolThread}");
+            // }, 3);
+            //
+            // ThreadingHelpers.ExecuteOnThreadPool(() =>
+            // {
+            //     var thread = Thread.CurrentThread;
+            //     Console.WriteLine(
+            //         $"Hello from thread {thread.ManagedThreadId} from a pool: {thread.IsThreadPoolThread}");
+            // }, 3);
         }
     }
 }
