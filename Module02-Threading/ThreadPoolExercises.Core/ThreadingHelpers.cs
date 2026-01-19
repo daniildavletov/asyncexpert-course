@@ -16,42 +16,40 @@ namespace ThreadPoolExercises.Core
             // * In a loop, check whether `token` is not cancelled
             // * If an `action` throws and exception (or token has been cancelled) - `errorAction` should be invoked (if provided)
 
-            // bool hasError = false;
-            //
-            // for (int i = 0; i < repeats; i++)
-            // {
-            //     if (token.IsCancellationRequested)
-            //     {
-            //         errorAction?.Invoke(new OperationCanceledException());
-            //         return;
-            //     }
-            //
-            //     Thread thread = new Thread(_ =>
-            //     {
-            //         try
-            //         {
-            //             token.ThrowIfCancellationRequested();
-            //             action();
-            //         }
-            //         catch (Exception e)
-            //         {
-            //             Console.WriteLine(e);
-            //             hasError = true;
-            //             errorAction?.Invoke(e);
-            //         }
-            //         finally
-            //         {
-            //             resetEvent.Set();
-            //         }
-            //     });
-            //     
-            //     resetEvent.WaitOne();
-            //     
-            //     if (hasError)
-            //     {
-            //         break;
-            //     }
-            // }
+            bool hasError = false;
+            
+            for (int i = 0; i < repeats; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    errorAction?.Invoke(new OperationCanceledException());
+                    return;
+                }
+
+                Thread thread = new Thread(_ =>
+                {
+                    try
+                    {
+                        token.ThrowIfCancellationRequested();
+                        action();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        hasError = true;
+                        errorAction?.Invoke(e);
+                    }
+                });
+                
+                thread.Start();
+
+                thread.Join();
+                
+                if (hasError)
+                {
+                    break;
+                }
+            }
         }
 
         public static void ExecuteOnThreadPool(
